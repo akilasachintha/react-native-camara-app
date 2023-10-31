@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "camara-app",
-    "slug": "camara-app",
+    "name": "Eco Paint",
+    "slug": "react-native-camara-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon1.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
+      "image": "./assets/splash1.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": [
@@ -19,12 +19,19 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-icon1.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ecopaint"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8b6514e3-dbbe-49b4-82ed-434d77e1423f"
+      }
+    },
+    "owner": "akilasachintha"
   }
 }

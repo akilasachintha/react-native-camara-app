@@ -17,9 +17,8 @@ import {THEME} from "@theme/theme";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {StatusBar} from "expo-status-bar";
 import {Entypo, Ionicons} from '@expo/vector-icons';
-import * as Location from 'expo-location';
 
-export default function HomeScreen() {
+export default function HomeDeceaseScreen() {
     const cameraRef = useRef<Camera | null>(null);
     const [isCameraReady, setIsCameraReady] = useState(false);
     const [isTipToFollow, setIsTipToFollow] = useState(true);
@@ -29,13 +28,6 @@ export default function HomeScreen() {
     const [type, setType] = useState(CameraType.back);
     const [flashMode, setFlashMode] = useState(FlashMode.off);
     const [autoFocus, setAutoFocus] = useState(AutoFocus.auto);
-
-    const [location, setLocation] = useState<Location.LocationObject>({
-        coords: {
-            latitude: 0,
-            longitude: 0
-        }
-    } as Location.LocationObject);
     const {showToast} = useToast();
     const {hideLoading} = useLoadingContext();
     const navigation = useNavigation();
@@ -43,17 +35,12 @@ export default function HomeScreen() {
     const requestCameraPermission = async () => {
         const {status: camaraStatus} = await getCameraPermissionsAsync();
         const {status: mediaStatus} = await MediaLibrary.requestPermissionsAsync();
-        const {status: locationStatus} = await Location.getBackgroundPermissionsAsync();
 
         if (camaraStatus !== 'granted') {
             const {status} = await requestCameraPermissionsAsync();
             setIsCameraReady(status === 'granted');
         } else {
             setIsCameraReady(true);
-        }
-
-        if (locationStatus !== 'granted') {
-            await Location.requestBackgroundPermissionsAsync();
         }
 
         if (mediaStatus !== 'granted') {
@@ -80,7 +67,7 @@ export default function HomeScreen() {
     const takePictureAndUpload = async () => {
         console.log('takePictureAndUpload');
         if (cameraRef.current) {
-            const options = { quality: 0.5, base64: true };
+            const options = {quality: 0.5, base64: true};
             const data = await cameraRef.current.takePictureAsync(options);
 
             let photo = {
@@ -107,10 +94,8 @@ export default function HomeScreen() {
 
             // @ts-ignore
             formData.append('image', photo);
-            formData.append('longitude', location.coords.longitude.toString());
-            formData.append('latitude', location.coords.latitude.toString());
 
-            axiosInstance.post('upload', formData, {
+            axiosInstance.post('disease', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -119,28 +104,14 @@ export default function HomeScreen() {
                     console.log(response.data);
                     showToast('Image uploaded successfully');
 
-                    const confidence = response && response.data && response.data.Confidence;
-                    const prediction = response && response.data && response.data.predicted_type;
-                    const week = response && response.data && response.data.Week;
-                    const videos = response && response.data && response.data.videos;
-                    const images = response && response.data && response.data.sample_images;
+                    const decease = response && response.data && response.data.disease;
 
-                    if (confidence && prediction && week && videos && images) {
+                    if (decease) {
                         // @ts-ignore
-                        navigation.replace('Prediction', {image: data.uri, confidence, prediction, week, videos, images});
+                        navigation.replace('PredictionDecease', {image: data.uri, decease});
                     } else {
                         showToast('Error getting prediction');
                     }
-
-                    if (response && response.data && response.data.predicted_type === 'Unknown') {
-                        // @ts-ignore
-                        navigation.replace('SubmitPlant', {
-                            image: data.uri,
-                            latitude: location.coords.latitude,
-                            longitude: location.coords.longitude
-                        });
-                    }
-
                     hideLoading();
                 })
                 .catch(error => console.log(error));
@@ -190,22 +161,10 @@ export default function HomeScreen() {
             cameraRef.current.resumePreview();
         }
 
-        (async () => {
-            let {status} = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.log('Permission to access location was denied');
-                return;
-            }
-
-            let location = await Location.getCurrentPositionAsync({});
-            setLocation(location);
-            console.log(location);
-        })();
-
     }, []);
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{flex: 1}}>
             <View style={{flex: 1}}>
                 <Camera
                     style={{flex: 1}}

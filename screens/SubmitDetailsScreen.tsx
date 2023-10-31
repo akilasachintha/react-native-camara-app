@@ -4,81 +4,90 @@ import {PATHS} from "@constants/PATHS";
 import {StatusBar} from "expo-status-bar";
 import * as yup from 'yup';
 import {Formik} from "formik";
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {BASE_URL, createAxiosInstance} from "@config/axiosConfig";
 import {useAuthContext} from "@context/AuthContext";
 import {useToast} from "@context/ToastContext";
 import {useLoadingContext} from "@context/LoadingContext";
+import {THEME} from "@theme/theme";
 
 const initialValues = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    city: '',
-    occupation: '',
-    password: '',
-    confirmPassword: '',
+    plantName: '',
+    plantWeek: '',
+    otherDetails: '',
 };
 
 interface FormField {
     name: string;
     label: string;
     secureTextEntry?: boolean;
+    height?: number;
 }
 
 const validationSchema = yup.object().shape({
-    firstName: yup.string().required('First Name is required'),
-    lastName: yup.string().required('Last Name is required'),
-    email: yup.string().email('Please enter a valid email').required('Email is required'),
-    city: yup.string().required('City is required'),
-    occupation: yup.string().required('Occupation is required'),
-    password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-    // @ts-ignore
-    confirmPassword: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),
+    plantName: yup
+        .string()
+        .required('Plant name is required'),
+    plantWeek: yup
+        .string()
+        .required('Plant week is required'),
 });
 
 const formFields: FormField[] = [
-    {name: 'firstName', label: 'First Name'},
-    {name: 'lastName', label: 'Last Name'},
-    {name: 'email', label: 'Email'},
-    {name: 'city', label: 'City'},
-    {name: 'occupation', label: 'Occupation'},
-    {name: 'password', label: 'Password', secureTextEntry: true},
-    {name: 'confirmPassword', label: 'Confirm Password', secureTextEntry: true},
+    {name: 'plantName', label: 'Plant Species'},
+    {name: 'plantWeek', label: 'Known Plant Age'},
+    {name: 'otherDetails', label: 'Other Details', height: 4}
 ];
 
-const RegisterScreen: React.FC = () => {
+const SubmitDetailsScreen: React.FC = () => {
     const navigation = useNavigation();
     const authContext = useAuthContext();
     const axiosInstance = createAxiosInstance(authContext, BASE_URL.ECO_PAINT);
     const {showToast} = useToast();
     const {hideLoading} = useLoadingContext();
+    const route = useRoute();
+    // @ts-ignore
+    const {image, latitude, longitude} = route.params;
 
     const handleSubmit = async (values: any) => {
-        const data = {
-            first_name: values.firstName,
-            last_name: values.lastName,
-            email: values.email,
-            city: values.city,
-            occupation: values.occupation,
-            password: values.password,
-        }
+        let formData = new FormData();
+        let photo = {
+            uri: image,
+            type: 'image/jpeg',
+            name: 'photo.jpg',
+        };
 
-        const response = await axiosInstance.post('/register', data);
-        if (response.status === 200) {
-            // @ts-ignore
-            navigation.navigate('Login');
-            showToast("Successfully registered");
-            hideLoading();
-        } else {
-            showToast("Something went wrong");
-            hideLoading();
-        }
+        // @ts-ignore
+        formData.append('image', photo);
+        formData.append('longitude', longitude.toString());
+        formData.append('latitude', latitude.toString());
+        formData.append('plant_name', values.plantName);
+        formData.append('plant_week', values.plantWeek);
+
+        axiosInstance.post('undefinedimage', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+            .then(response => {
+                console.log(response.data);
+                showToast('Image uploaded successfully');
+
+                if (response.data) {
+                    // @ts-ignore
+                    navigation.replace('Main');
+                }
+
+                hideLoading();
+            })
+            .catch(error => console.log(error));
     }
 
     // @ts-ignore
     return (
-        <ImageBackground source={PATHS.IMAGES.BACKGROUND} style={styles.container}>
+        <ImageBackground source={PATHS.IMAGES.SEARCH} style={styles.container}>
+            <Text style={{color: THEME.COLORS.white, fontSize: 28, alignItems: "center", paddingVertical: 30}}>ENTER
+                PLANT DETAILS</Text>
             <KeyboardAvoidingView behavior="padding">
                 <Formik
                     initialValues={initialValues}
@@ -90,13 +99,15 @@ const RegisterScreen: React.FC = () => {
                             {formFields.map((field: FormField) => (
                                 <View style={styles.inputView} key={field.name}>
                                     <TextInput
-                                        style={styles.input}
+                                        style={[styles.input, {height: field.height ? field.height * 40 : 40}]}
                                         placeholder={field.label}
                                         onChangeText={handleChange(field.name)}
                                         // @ts-ignore
                                         value={values[field.name]}
                                         placeholderTextColor="white"
                                         secureTextEntry={field.secureTextEntry}
+                                        multiline={true}
+                                        numberOfLines={field.height}
                                     />
                                     {touched[field.name] && errors[field.name] &&
                                         <Text style={styles.errorText}>{errors[field.name]}</Text>}
@@ -104,17 +115,7 @@ const RegisterScreen: React.FC = () => {
                             ))}
 
                             <TouchableOpacity onPress={() => handleSubmit()} style={styles.button}>
-                                <Text>Register</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                onPress={
-                                    // @ts-ignore
-                                    () => navigation.navigate('Login')
-                                }
-                                style={styles.loginButton}
-                            >
-                                <Text style={styles.loginText}>Already a Member? Login</Text>
+                                <Text>Submit</Text>
                             </TouchableOpacity>
                         </>
                     )}
@@ -164,4 +165,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default RegisterScreen;
+export default SubmitDetailsScreen;

@@ -20,7 +20,7 @@ export default function PlantListScreen() {
     const authContext = useAuthContext();
     const axiosInstance = createAxiosInstance(authContext, BASE_URL.ECO_PAINT);
     const {showToast} = useToast();
-    const {showLoading, hideLoading} = useLoadingContext();
+    const {hideLoading} = useLoadingContext();
     const [searchQuery, setSearchQuery] = useState("");
     const [plants, setPlants] = useState([]);
     const [filteredPlants, setFilteredPlants] = useState([]);

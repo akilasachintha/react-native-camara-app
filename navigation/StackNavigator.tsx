@@ -22,7 +22,7 @@ export default function StackNavigator() {
             animation: "slide_from_right",
         }}>
             {
-                isLoggedIn && (
+                !isLoggedIn && (
                     <>
                         <Stack.Screen name="Login" component={LoginScreen}/>
                         <Stack.Screen name="Register" component={RegisterScreen}/>

@@ -21,14 +21,8 @@ export default function StackNavigator() {
             headerShown: false,
             animation: "slide_from_right",
         }}>
-            {
-                !isLoggedIn && (
-                    <>
-                        <Stack.Screen name="Login" component={LoginScreen}/>
-                        <Stack.Screen name="Register" component={RegisterScreen}/>
-                    </>
-                )
-            }
+            <Stack.Screen name="Login" component={LoginScreen}/>
+            <Stack.Screen name="Register" component={RegisterScreen}/>
             <Stack.Screen name="Main" component={MainScreen}/>
             <Stack.Screen name="Home" component={HomeScreen}/>
             <Stack.Screen name="HomeDecease" component={HomeDeceaseScreen}/>

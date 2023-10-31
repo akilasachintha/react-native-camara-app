@@ -1,5 +1,14 @@
 import React from "react";
-import {ImageBackground, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+    ImageBackground,
+    KeyboardAvoidingView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
 import {PATHS} from "@constants/PATHS";
 import {StatusBar} from "expo-status-bar";
 import * as yup from 'yup';
@@ -20,7 +29,7 @@ const initialValues = {
     confirmPassword: '',
 };
 
-interface FormField {
+export interface FormField {
     name: string;
     label: string;
     secureTextEntry?: boolean;
@@ -76,24 +85,22 @@ const RegisterScreen: React.FC = () => {
         }
     }
 
-    // @ts-ignore
     return (
         <ImageBackground source={PATHS.IMAGES.BACKGROUND} style={styles.container}>
-            <KeyboardAvoidingView behavior="padding">
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
                     {({values, handleChange, handleSubmit, errors, touched}: any) => (
-                        <>
+                        <View style={styles.formContainer}>
                             {formFields.map((field: FormField) => (
                                 <View style={styles.inputView} key={field.name}>
                                     <TextInput
                                         style={styles.input}
                                         placeholder={field.label}
                                         onChangeText={handleChange(field.name)}
-                                        // @ts-ignore
                                         value={values[field.name]}
                                         placeholderTextColor="white"
                                         secureTextEntry={field.secureTextEntry}
@@ -103,23 +110,21 @@ const RegisterScreen: React.FC = () => {
                                 </View>
                             ))}
 
-                            <TouchableOpacity onPress={() => handleSubmit()} style={styles.button}>
+                            <TouchableOpacity onPress={handleSubmit} style={styles.button}>
                                 <Text>Register</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
-                                onPress={
-                                    // @ts-ignore
-                                    () => navigation.navigate('Login')
-                                }
+                                // @ts-ignore
+                                onPress={() => navigation.navigate('Login')}
                                 style={styles.loginButton}
                             >
                                 <Text style={styles.loginText}>Already a Member? Login</Text>
                             </TouchableOpacity>
-                        </>
+                        </View>
                     )}
                 </Formik>
-            </KeyboardAvoidingView>
+            </ScrollView>
             <StatusBar style="light"/>
         </ImageBackground>
     );
@@ -129,10 +134,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
-        paddingHorizontal: "6%",
+    },
+    formContainer: {
+        justifyContent: "center",
+        marginHorizontal: "7%",
     },
     inputView: {
-        marginBottom: "5%",
+        marginBottom: 16,
     },
     input: {
         height: 40,
@@ -144,20 +152,20 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: 'red',
-        marginVertical: "1%",
+        marginVertical: 8,
     },
     button: {
         alignItems: "center",
         backgroundColor: "#DDDDDD",
-        padding: 10,
+        padding: 12,
         borderRadius: 10,
-        marginTop: "5%",
+        marginTop: 20,
     },
     loginButton: {
         alignItems: "center",
-        padding: 10,
+        padding: 12,
         borderRadius: 10,
-        marginTop: "2%",
+        marginTop: 12,
     },
     loginText: {
         color: 'white',

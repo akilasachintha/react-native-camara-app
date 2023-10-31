@@ -42,7 +42,7 @@ export default function HomeScreen() {
 
     const requestCameraPermission = async () => {
         const {status: camaraStatus} = await getCameraPermissionsAsync();
-        const {status: mediaStatus} = await MediaLibrary.requestPermissionsAsync();
+        const {status: mediaStatus} = await MediaLibrary.getPermissionsAsync();
         const {status: locationStatus} = await Location.getBackgroundPermissionsAsync();
 
         if (camaraStatus !== 'granted') {

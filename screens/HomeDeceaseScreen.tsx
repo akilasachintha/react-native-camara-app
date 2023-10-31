@@ -82,12 +82,12 @@ export default function HomeDeceaseScreen() {
                 throw new Error('Could not create asset');
             }
 
-            const album = await MediaLibrary.getAlbumAsync("Eco Paint");
+            const album = await MediaLibrary.getAlbumAsync("Eco Print");
 
             if (album) {
                 await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
             } else {
-                await MediaLibrary.createAlbumAsync("Eco Paint", asset, false);
+                await MediaLibrary.createAlbumAsync("Eco Print", asset, false);
             }
 
             let formData = new FormData();
@@ -272,7 +272,7 @@ export default function HomeDeceaseScreen() {
                         <Ionicons name="camera-reverse-outline" size={32} color="black"/>
                     </TouchableOpacity>
                     <View style={styles.border}>
-                        <TouchableOpacity onPress={takePictureAndUpload} disabled={!isCameraReady}>
+                        <TouchableOpacity onPress={takePictureAndUpload}>
                             <View style={styles.captureButton}/>
                         </TouchableOpacity>
                     </View>
